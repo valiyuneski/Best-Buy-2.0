@@ -1,9 +1,5 @@
 import pytest
 from products import Product
-import store
-
-import pytest
-from products import Product
 
 def test_create_normal_product():
     """Test creating a normal product."""
