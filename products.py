@@ -1,3 +1,6 @@
+import promotions
+from promotions import Promotion
+
 class Product:
     """Represents a product with a name, price, and quantity.
     Attributes:
@@ -18,6 +21,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True if quantity > 0 else False
+        self.promotion = None  # default no promotion
 
     def get_quantity(self) -> int:
         """Returns the product's quantity."""
@@ -46,9 +50,14 @@ class Product:
         """Deactivates the product."""
         self.set_active(False)
 
-    def show(self):
+    def __str__(self):
+        """Returns a string representing the product."""
+        return f"{self.name}, Price: ${self.price:.2f}, Quantity: {self.quantity}"
+
+    def __repr__(self):
         """Returns a string representing the product."""
         return f"{self.name}, Price: ${self.price:.2f}, Quantity: {self.quantity}, Active: {'Yes' if self.active else 'No'}"
+
 
     def purchase(self, amount: int):
         if not self.active:
@@ -62,3 +71,29 @@ class Product:
         if self.quantity == 0:
             self.active = False
         return self.price * amount
+
+
+    def set_promotion(self, promotion: Promotion):
+        self.promotion = promotion
+
+
+    def get_promotion(self):
+        return self.promotion
+
+
+    def show(self):
+        promo_text = f" | Promotion: {self.promotion}" if self.promotion else ""
+        return f"{self.name} - ${self.price:.2f} ({self.quantity} available){promo_text}"
+
+
+    def buy(self, quantity: int) -> float:
+        if self.quantity < quantity:
+            raise ValueError(f"Not enough stock for {self.name}.")
+
+        if self.promotion:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
+
+        self.quantity -= quantity
+        return total_price
