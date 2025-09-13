@@ -46,13 +46,3 @@ class ThirdOneFree(Promotion):
         remainder = quantity % 3
         total = (trios * 2 * product.price) + (remainder * product.price)
         return total
-
-
-class PercentDiscount(Promotion):
-    def __init__(self, name: str, percent: float):
-        super().__init__(name)
-        self.percent = percent
-
-    def apply_promotion(self, product, quantity: int) -> float:
-        discount_multiplier = (100 - self.percent) / 100
-        return product.price * quantity * discount_multiplier
