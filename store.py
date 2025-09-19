@@ -3,7 +3,16 @@ from products import Product
 # ------------------ STORE ------------------
 class Store:
     def __init__(self, products=None):
-        self.products = products or []
+        if products is None:
+            self.products = [
+                Product("MacBook Air M2", 1450, 100, "Second Half price!"),
+                Product("Bose QuietComfort Earbuds", 250, 500, "Third One Free!"),
+                Product("Google Pixel 7", 500, 250),
+                Product("Windows License", 125, None, "30% off!"),
+                Product("Shipping", 10, 1, None),
+            ]
+        else:
+            self.products = products
 
     def __contains__(self, product):
         return product in self.products
@@ -15,12 +24,8 @@ class Store:
         return f"Store with {len(self.products)} products"
 
     def list_products(self):
-        if not self.products:
-            print("No products in store.")
-            return
-        for idx, product in enumerate(self.products, start=1):
-            status = "Active" if product.is_active() else "Inactive"
-            print(f"{idx}. {product} - Status: {status}")
+        for i, p in enumerate(self.products, start=1):
+            print(f"{i}. {p}")
 
     def total_items(self):
         total = 0
@@ -48,10 +53,6 @@ class Store:
                 amount = int(input("What amount do you want? "))
             except ValueError:
                 print("Invalid amount!")
-                continue
-
-            if product.limited_to and amount > product.limited_to:
-                print(f"This product is limited to {product.limited_to} per order!")
                 continue
 
             try:
