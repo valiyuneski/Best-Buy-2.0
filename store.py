@@ -1,18 +1,26 @@
 from products import Product
 
+# ------------------ STORE ------------------
 class Store:
-    def __init__(self):
-        self.products = [
-            Product("MacBook Air M2", 1450, 100, "Second Half price!"),
-            Product("Bose QuietComfort Earbuds", 250, 500, "Third One Free!"),
-            Product("Google Pixel 7", 500, 250),
-            Product("Windows License", 125, None, "30% off!"),
-            Product("Shipping", 10, 1, None),
-        ]
+    def __init__(self, products=None):
+        self.products = products or []
+
+    def __contains__(self, product):
+        return product in self.products
+
+    def __add__(self, other):
+        return Store(self.products + other.products)
+
+    def __str__(self):
+        return f"Store with {len(self.products)} products"
 
     def list_products(self):
-        for i, p in enumerate(self.products, start=1):
-            print(f"{i}. {p}")
+        if not self.products:
+            print("No products in store.")
+            return
+        for idx, product in enumerate(self.products, start=1):
+            status = "Active" if product.is_active() else "Inactive"
+            print(f"{idx}. {product} - Status: {status}")
 
     def total_items(self):
         total = 0
@@ -42,8 +50,8 @@ class Store:
                 print("Invalid amount!")
                 continue
 
-            if product.quantity is not None and amount > product.quantity:
-                print(f"This product is limited to {product.quantity} per order!")
+            if product.limited_to and amount > product.limited_to:
+                print(f"This product is limited to {product.limited_to} per order!")
                 continue
 
             try:

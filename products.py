@@ -1,3 +1,4 @@
+# ------------------ PRODUCT TYPES ------------------
 class Product:
     def __init__(self, name, price, quantity, promotion=None):
         if not name:
@@ -6,30 +7,39 @@ class Product:
             raise ValueError("Product price cannot be negative!")
 
         self.name = name
-        self.price = price
+        self._price = price
         self.quantity = quantity  # None for unlimited
-        self.promotion = promotion
+        self._promotion = promotion
+
+    # price property
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
+        if value < 0:
+            raise ValueError("Product price cannot be negative!")
+        self._price = value
+
+    # promotion property
+    @property
+    def promotion(self):
+        return self._promotion
+
+    @promotion.setter
+    def promotion(self, promo):
+        self._promotion = promo
 
     def __str__(self):
         q_str = "Unlimited" if self.quantity is None else str(self.quantity)
         promo_str = f" Promotion: {self.promotion}" if self.promotion else " Promotion: None"
-        return f"{self.name}, Price: ${self.price}, Quantity: {q_str},{promo_str}"
+        return f"{self.name}, Price: ${self.price} Quantity:{q_str}{promo_str}"
 
     def calculate_price(self, amount):
-        if self.promotion == "Second Half price!":
-            full_price = (amount // 2 + amount % 2) * self.price
-            half_price = (amount // 2) * (self.price / 2)
-            return full_price + half_price
-
-        elif self.promotion == "Third One Free!":
-            paid_items = amount - (amount // 3)
-            return paid_items * self.price
-
-        elif self.promotion == "30% off!":
-            return amount * self.price * 0.7
-
-        else:
-            return amount * self.price
+        if self.promotion:
+            return self.promotion.apply_promotion(self, amount)
+        return amount * self.price
 
     def reduce_stock(self, amount):
         if self.quantity is not None:
@@ -42,13 +52,19 @@ class Product:
             return True
         return self.quantity > 0
 
+    # compare by price
+    def __lt__(self, other):
+        return self.price < other.price
+
+    def __gt__(self, other):
+        return self.price > other.price
+
 
 class NonStockedProduct(Product):
     def __init__(self, name, price, promotion=None):
         super().__init__(name, price, quantity=0, promotion=promotion)
 
     def reduce_stock(self, amount):
-        # Stock does not change
         return
 
     def is_active(self):
