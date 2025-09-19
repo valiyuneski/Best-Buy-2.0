@@ -7,7 +7,7 @@ class Store:
             Product("Bose QuietComfort Earbuds", 250, 500, "Third One Free!"),
             Product("Google Pixel 7", 500, 250),
             Product("Windows License", 125, None, "30% off!"),
-            Product("Shipping", 10, 1, None, limited_to=1),
+            Product("Shipping", 10, 1, None),
         ]
 
     def list_products(self):
@@ -42,8 +42,8 @@ class Store:
                 print("Invalid amount!")
                 continue
 
-            if product.limited_to and amount > product.limited_to:
-                print(f"This product is limited to {product.limited_to} per order!")
+            if product.quantity is not None and amount > product.quantity:
+                print(f"This product is limited to {product.quantity} per order!")
                 continue
 
             try:

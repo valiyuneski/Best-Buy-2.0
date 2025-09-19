@@ -1,5 +1,5 @@
 class Product:
-    def __init__(self, name, price, quantity, promotion=None, limited_to=None):
+    def __init__(self, name, price, quantity, promotion=None):
         if not name:
             raise ValueError("Product name cannot be empty!")
         if price < 0:
@@ -9,7 +9,6 @@ class Product:
         self.price = price
         self.quantity = quantity  # None for unlimited
         self.promotion = promotion
-        self.limited_to = limited_to
 
     def __str__(self):
         q_str = "Unlimited" if self.quantity is None else str(self.quantity)
@@ -42,3 +41,32 @@ class Product:
         if self.quantity is None:
             return True
         return self.quantity > 0
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name, price, promotion=None):
+        super().__init__(name, price, quantity=0, promotion=promotion)
+
+    def reduce_stock(self, amount):
+        # Stock does not change
+        return
+
+    def is_active(self):
+        return True
+
+    def __str__(self):
+        return super().__str__() + " (Non-Stocked Product)"
+
+
+class LimitedProduct(Product):
+    def __init__(self, name, price, quantity, maximum, promotion=None):
+        super().__init__(name, price, quantity, promotion)
+        self.maximum = maximum
+
+    def reduce_stock(self, amount):
+        if amount > self.maximum:
+            raise ValueError(f"This product is limited to {self.maximum} per order!")
+        super().reduce_stock(amount)
+
+    def __str__(self):
+        return super().__str__() + f" (Limited to {self.maximum} per order)"

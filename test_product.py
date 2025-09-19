@@ -1,6 +1,6 @@
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 import pytest
-# ------------------ TESTS ------------------
+## ------------------ TESTS ------------------
 
 def test_create_normal_product():
     product = Product("MacBook Air M2", price=1450, quantity=100)
@@ -59,3 +59,25 @@ def test_thirty_percent_off_promotion():
     product = Product("Windows License", price=100, quantity=None, promotion="30% off!")
     assert product.calculate_price(1) == 70
     assert product.calculate_price(3) == 210
+
+
+# ------------------ NEW PRODUCT TYPES TESTS ------------------
+
+def test_non_stocked_product_always_active():
+    product = NonStockedProduct("Windows License", price=125)
+    assert product.quantity == 0
+    assert product.is_active() is True
+    product.reduce_stock(10)  # should not change anything
+    assert product.quantity == 0
+
+
+def test_limited_product_rejects_exceeding_order():
+    product = LimitedProduct("Shipping", price=10, quantity=10, maximum=1)
+    with pytest.raises(ValueError):
+        product.reduce_stock(2)
+
+
+def test_limited_product_allows_valid_order():
+    product = LimitedProduct("Shipping", price=10, quantity=10, maximum=1)
+    product.reduce_stock(1)
+    assert product.quantity == 9
