@@ -2,6 +2,7 @@ from store import Store
 
 
 def main():
+    """Main function to run the store CLI."""
     store = Store()
 
     while True:
