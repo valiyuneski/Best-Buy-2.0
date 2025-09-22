@@ -1,44 +1,51 @@
 from abc import ABC, abstractmethod
-# ------------------ PROMOTIONS ------------------
-class Promotion(ABC):
-    """Abstract base class for promotions."""
+
+class Promotions(ABC):
+    """ Abstract parent class for general promotions to apply"""
+
     def __init__(self, name):
         self.name = name
 
     @abstractmethod
-    def apply_promotion(self, product, quantity):
-        """Apply the promotion to the product for the given quantity."""
+    def apply_promotion(self, product, quantity) -> float:
         pass
 
-    def __str__(self):
-        """String representation of the promotion."""
-        return self.name
+class PercentageDiscount(Promotions):
+    """ Sub-class handling promotions in terms of
+    adding a %- discount to a product price """
 
-
-class PercentDiscount(Promotion):
-    """Percentage discount promotion."""
-    def __init__(self, name, percent):
-        """Initialize with name and discount percent."""
+    def __init__(self, name, discount_percent):
         super().__init__(name)
-        self.percent = percent
+        self.discount_percent = discount_percent
 
-    def apply_promotion(self, product, quantity):
-        """Apply percentage discount to the product price."""
-        return product.price * quantity * (1 - self.percent / 100)
+    def apply_promotion(self, product, quantity) -> float:
+        discount = product.price * (self.discount_percent / 100)
+        return (product.price - discount) * quantity
+
+class SecondItemHalfPrice(Promotions):
+    """ Sub-class handling promotions in terms of
+    reducing the product price of every second product """
+
+    def __init__(self, name):
+        super().__init__(name)
+
+    def apply_promotion(self, product, quantity) -> float:
+        full_price_items_count = (quantity // 2) + (quantity % 2)
+        half_price_items_count = (quantity // 2)
+
+        discounted_price = ((full_price_items_count * product.price) +
+                            (half_price_items_count * (product.price * 0.5)))
+
+        return discounted_price
 
 
-class SecondHalfPrice(Promotion):
-    """Second item at half price promotion."""
-    def apply_promotion(self, product, quantity):
-        """Apply second half price promotion."""
-        full_price = (quantity // 2 + quantity % 2) * product.price
-        half_price = (quantity // 2) * (product.price / 2)
-        return full_price + half_price
+class Buy1Get1Free(Promotions):
+    """ Sub-class handling promotions in terms of
+    not to apply the product price to every second product """
 
+    def __init__(self, name):
+        super().__init__(name)
 
-class ThirdOneFree(Promotion):
-    """Third item free promotion."""
-    def apply_promotion(self, product, quantity):
-        """Apply third one free promotion."""
-        paid_items = quantity - (quantity // 3)
-        return paid_items * product.price
+    def apply_promotion(self, product, quantity) -> float:
+        payable_quantity = (quantity // 2) + (quantity % 2)
+        return payable_quantity * product.price
